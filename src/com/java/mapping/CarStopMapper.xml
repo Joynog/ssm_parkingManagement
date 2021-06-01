@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.java.dao.CarStopMapper" >
+  <resultMap id="BaseResultMap" type="com.java.model.CarStop" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="Name" property="name" jdbcType="VARCHAR" />
+    <result column="CarStopType_ID" property="carstoptypeId" jdbcType="INTEGER" />
+  </resultMap>
+
+  <sql id="get_where" >
+    <where>
+    	<if test="name!=null and name!=''">
+	        	AND name like CONCAT('%',#{name,jdbcType=VARCHAR},'%')   
+      </if>
+      <if test="carstoptypeId!=null and carstoptypeId!=''">
+	        	AND CarStopType_ID =#{carstoptypeId,jdbcType=VARCHAR}   
+      </if>
+    </where>
+  </sql>
+  <sql id="setpage">
+	<if test="page!=null">
+	    order by #{page.order,jdbcType=VARCHAR}
+	    LIMIT #{page.sum,jdbcType=INTEGER}, #{page.pagesize,jdbcType=INTEGER}
+    </if>
+</sql>
+<select id="Get" resultMap="BaseResultMap" parameterType="com.java.model.CarStop">
+    select * from carstop
+  	<include refid="get_where" />
+    <include refid="setpage" />
+    </select>
+    
+    <select id="GetEmpty" resultMap="BaseResultMap" parameterType="com.java.model.CarStop">
+    select * from carstop where id not in(select carstop_ID from stop where back=0)
+    </select>
+    
+    <select id="GetCount"  parameterType="com.java.model.Client" resultType="java.lang.Integer">
+    select count(*) 
+    from carstop
+    <include refid="get_where" />
+  </select>
+  
+  <select id="GetByID" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select * from carstop
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="Del" parameterType="java.lang.Integer" >
+    delete from carstop
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="Add" parameterType="com.java.model.CarStop" >
+    insert into carstop 
+    values (null, #{name,jdbcType=VARCHAR}, #{carstoptypeId,jdbcType=INTEGER})
+  </insert>
+  
+  <update id="Edit" parameterType="com.java.model.CarStop" >
+    update carstop
+    set Name = #{name,jdbcType=VARCHAR},
+      carstopType_ID = #{carstoptypeId,jdbcType=INTEGER}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  
+</mapper>

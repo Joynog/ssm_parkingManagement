@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.java.dao.StopMapper" >
+  <resultMap id="BaseResultMap" type="com.java.model.Stop" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="CarStop_ID" property="carstopId" jdbcType="INTEGER" />
+    <result column="starttime" property="starttime" jdbcType="TIMESTAMP" />
+    <result column="endtime" property="endtime" jdbcType="TIMESTAMP" />
+    <result column="mid" property="mid" jdbcType="VARCHAR" />
+    <result column="money" property="money" jdbcType="INTEGER" />
+    <result column="mins" property="mins" jdbcType="INTEGER" />
+    <result column="back" property="back" jdbcType="INTEGER" />
+    <result column="clientmid" property="clientmid" jdbcType="VARCHAR" />
+  </resultMap>
+  
+<sql id="get_where" >
+    <where>
+    	<if test="carstopId!=null and carstopId!=''">
+	        	AND CarStop_ID= #{carstopId,jdbcType=INTEGER}  
+      </if>
+      <if test="mid!=null and mid!=''">
+	        	AND mid= #{mid,jdbcType=INTEGER}  
+      </if>
+      <if test="back!=null">
+	        	AND back=#{back}
+      </if>
+      <if test="clientmid!=null">
+	        	AND  ${clientmid}
+      </if>
+      <if test="starttime!=null">
+	        	AND month(starttime) = month(#{starttime});
+      </if>
+    </where>
+  </sql>
+  <sql id="setpage">
+	<if test="page!=null">
+	    order by #{page.order,jdbcType=VARCHAR}
+	    LIMIT #{page.sum,jdbcType=INTEGER}, #{page.pagesize,jdbcType=INTEGER}
+    </if>
+</sql>
+<select id="Get" resultMap="BaseResultMap" parameterType="com.java.model.Stop">
+    select * from stop
+  	<include refid="get_where" />
+    <include refid="setpage" />
+    </select>
+    <select id="GetCount"  parameterType="com.java.model.Stop" resultType="java.lang.Integer">
+    select count(*) 
+    from stop
+    <include refid="get_where" />
+  </select>
+  
+   <select id="GetSum"  parameterType="com.java.model.Stop" resultType="java.lang.Integer">
+    select COALESCE(SUM(money),0)
+    from stop
+    <include refid="get_where" />
+  </select>
+
+
+  <select id="GetByID" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select * from stop
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="Del" parameterType="java.lang.Integer" >
+    delete from stop
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="Add" parameterType="com.java.model.Stop" >
+    insert into stop   
+    values (null, #{carstopId,jdbcType=INTEGER}, now(),now(),#{mid},0,0,0)
+  </insert>
+  
+  <update id="Edit" parameterType="com.java.model.Stop" >
+    update stop set endtime=now(),money=#{money,jdbcType=INTEGER},mins=#{mins,jdbcType=INTEGER},back=1 where id=#{id,jdbcType=INTEGER}
+  </update>
+ 
+  
+</mapper>
